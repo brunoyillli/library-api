@@ -1,5 +1,6 @@
 package com.brunomendes.libraryapi.api.resource;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,11 +17,12 @@ import com.brunomendes.libraryapi.service.BookService;
 public class BookController {
 	
 	private BookService service;
+	private ModelMapper modelMapper; 
 	
 	
-	
-	public BookController(BookService service) {
+	public BookController(BookService service, ModelMapper mapper) {
 		this.service = service;
+		this.modelMapper = mapper;
 	}
 
 
@@ -28,20 +30,9 @@ public class BookController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public BookDTO create( @RequestBody BookDTO dto) {
-		Book entity = Book.builder()
-				.author(dto.getAuthor())
-				.title(dto.getTitle())
-				.isbn(dto.getIsbn())
-				.build();
-		
+		Book entity = modelMapper.map(dto, Book.class);
 		entity = service.save(entity);
-		
-		return BookDTO.builder()
-				.id(entity.getId())
-				.author(entity.getAuthor())
-				.title(entity.getTitle())
-				.isbn(entity.getIsbn())
-				.build();
+		return modelMapper.map(entity, BookDTO.class);
 	}
 
 }
