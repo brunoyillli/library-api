@@ -2,6 +2,7 @@ package com.brunomendes.libraryapi.service.impl;
 
 import org.springframework.stereotype.Service;
 
+import com.brunomendes.libraryapi.exception.BusinessException;
 import com.brunomendes.libraryapi.model.entity.Book;
 import com.brunomendes.libraryapi.model.repository.BookRepository;
 import com.brunomendes.libraryapi.service.BookService;
@@ -17,7 +18,9 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Book save(Book book) {
-
+        if( repository.existsByIsbn(book.getIsbn()) ){
+            throw new BusinessException("Isbn já cadastrado.");
+        }
 		return repository.save(book);
 	}
 
