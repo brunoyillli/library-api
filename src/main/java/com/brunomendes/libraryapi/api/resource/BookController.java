@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.brunomendes.libraryapi.api.dto.BookDTO;
 import com.brunomendes.libraryapi.api.exception.ApiErros;
@@ -45,8 +46,11 @@ public class BookController {
 	
 	@GetMapping("{id}")
 	public BookDTO get(@PathVariable Long id) {
-		Book book = service.getById(id).get();
-		return modelMapper.map(book, BookDTO.class);
+		
+		return service.getById(id)
+				.map( book -> modelMapper.map(book, BookDTO.class) )
+				.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
