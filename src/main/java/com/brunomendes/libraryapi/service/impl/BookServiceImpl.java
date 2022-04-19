@@ -31,4 +31,16 @@ public class BookServiceImpl implements BookService {
 		return Optional.empty();
 	}
 
+	@Override
+	public void delete(Book book) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Book update(Book book) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
