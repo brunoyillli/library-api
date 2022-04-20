@@ -3,6 +3,8 @@ package com.brunomendes.libraryapi.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,10 +54,6 @@ public class BookServiceTest {
 		
 	}
 	
-    private Book createValidBook() {
-        return Book.builder().isbn("123").author("Fulano").title("As aventuras").build();
-    }
-	
     @Test
     @DisplayName("Deve lançar erro de negocio ao tentar salvar um livro com isbn duplicado")
     public void shouldNotSaveABookWithDuplicatedISBN(){
@@ -71,5 +69,40 @@ public class BookServiceTest {
 
         Mockito.verify(repository, Mockito.never()).save(book);
 
+    }
+    
+    @Test
+    @DisplayName("Deve obter um livro por id")
+    public void getByIdTest() {
+    	Long id = 1l;
+    	Book book = createValidBook();
+    	book.setId(id);
+    	Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+    	
+    	Optional<Book> foundBook = service.getById(id);
+    	
+    	assertThat( foundBook.isPresent() ).isTrue();
+    	assertThat( foundBook.get().getId()).isEqualTo(id);
+    	assertThat( foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
+    	assertThat( foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
+    	assertThat( foundBook.get().getTitle()).isEqualTo(book.getTitle());
+    	
+    }
+    
+    @Test
+    @DisplayName("Deve retornar vazio ao obter um livro por id quando ele não existe na base.")
+    public void bookNotFoundByIdTest() {
+    	Long id = 1l;
+
+    	Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+    	
+    	Optional<Book> book = service.getById(id);
+    	
+    	assertThat( book.isPresent() ).isFalse();
+
+    }
+    
+    private Book createValidBook() {
+        return Book.builder().isbn("123").author("Fulano").title("As aventuras").build();
     }
 }
