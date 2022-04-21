@@ -33,14 +33,18 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public void delete(Book book) {
-		// TODO Auto-generated method stub
-		
+		if( book == null || book.getId() == null ) {
+			throw new IllegalArgumentException("Book id cant be null");
+		}
+		this.repository.delete(book);
 	}
 
 	@Override
 	public Book update(Book book) {
-		// TODO Auto-generated method stub
-		return null;
+		if( book == null || book.getId() == null ) {
+			throw new IllegalArgumentException("Book id cant be null");
+		}
+		return this.repository.save(book);
 	}
 
 }
