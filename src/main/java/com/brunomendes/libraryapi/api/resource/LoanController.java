@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.brunomendes.libraryapi.api.dto.LoanDTO;
 import com.brunomendes.libraryapi.model.entity.Book;
@@ -28,7 +29,9 @@ public class LoanController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Long create( @RequestBody LoanDTO dto ) {
-		Book book = bookService.getBookByIsbn(dto.getIsbn()).get();
+		Book book = bookService.getBookByIsbn(dto.getIsbn())
+				.orElseThrow( () -> 
+					new ResponseStatusException(HttpStatus.BAD_REQUEST, "Book not found for isbn"));
 		Loan entity = Loan.builder()
 				.book(book)
 				.custumer(dto.getCustomer())
