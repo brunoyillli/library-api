@@ -1,6 +1,6 @@
 package com.brunomendes.libraryapi.api.resource;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
@@ -67,7 +67,7 @@ public class LoanControllerTest {
 		
 		mvc.perform( request )
 				.andExpect( status().isCreated() )
-				.andExpect( jsonPath("id").value(1l));
+				.andExpect( content().string("1") );
 		
 	}
 }
