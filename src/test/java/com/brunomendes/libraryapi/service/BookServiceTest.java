@@ -1,6 +1,7 @@
 package com.brunomendes.libraryapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -157,7 +158,8 @@ public class BookServiceTest {
     	assertThat(book.getIsbn()).isEqualTo(updateBook.getIsbn());
     	assertThat(book.getAuthor()).isEqualTo(updateBook.getAuthor());    		
     }
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     @DisplayName("Deve filtrar livros pelas propriedades")
     public void findBookTest() {
     	
@@ -176,6 +178,21 @@ public class BookServiceTest {
     	assertThat(result.getContent()).isEqualTo(lista);
     	assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
     	assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    }
+    
+    @Test
+    @DisplayName("Deve obter um livro pelo isbn")
+    public void getBookByIsbnTest() {
+    	String isbn = "1230";
+    	Mockito.when(repository.findByIsbn(isbn)).thenReturn( Optional.of(Book.builder().id(1l).isbn(isbn).build()) );
+    	
+    	Optional<Book> book = service.getBookByIsbn(isbn);
+    	
+    	assertThat(book.isPresent()).isTrue();
+    	assertThat(book.get().getId()).isEqualTo(1l);
+    	assertThat(book.get().getIsbn()).isEqualTo(isbn);
+    	
+    	verify(repository, Mockito.times(1)).findByIsbn(isbn);	
     }
     
     private Book createValidBook() {
