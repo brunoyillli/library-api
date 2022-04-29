@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Loan {
 	
 	private Long id;
-	private String custumer;
+	private String customer;
 	private Book book;
 	private LocalDate loanDate;
 	private Boolean returned;
