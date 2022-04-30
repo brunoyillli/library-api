@@ -1,6 +1,7 @@
 package com.brunomendes.libraryapi.service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -83,5 +84,50 @@ public class LoanServiceTest {
 				.hasMessage("Book already loaned");
 		
 		verify(repository, never()).save(savingLoan);
+	}
+	
+	@Test
+	@DisplayName("Deve obter as informacoes de um emprestimo pelo ID")
+	public void getLoanDetaisTest() {
+		Long id = 1l;
+		
+		Loan loan = createLoan();
+		loan.setId(id);
+		
+		Mockito.when( repository.findById(id)).thenReturn(Optional.of(loan) );
+		
+		Optional<Loan> result = service.getById(id);
+		
+		assertThat(result.isPresent()).isTrue();
+		assertThat(result.get().getId()).isEqualTo(id);
+		assertThat(result.get().getCustomer()).isEqualTo(loan.getCustomer());
+		assertThat(result.get().getBook()).isEqualTo(loan.getBook());
+		assertThat(result.get().getLoanDate()).isEqualTo(loan.getLoanDate());
+		
+		verify(repository).findById(id);
+	}
+	
+	@Test
+	@DisplayName("Deve atualizar um emprestimo")
+	public void updateLoanTest() {
+		Loan loan = createLoan();
+		loan.setId(1l);
+		loan.setReturned(true);
+		when( repository.save(loan) ).thenReturn( loan );
+		
+		Loan updatedLoan = service.update(loan);
+		
+		assertThat(updatedLoan.getReturned()).isTrue();
+		
+		verify(repository).save(loan);
+	}
+	
+	public Loan createLoan() {
+		Book book = Book.builder().id(1l).build();
+		return Loan.builder()
+				.book(book)
+				.customer("Fulano")
+				.loanDate(LocalDate.now())
+				.build();
 	}
 }
