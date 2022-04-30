@@ -25,8 +25,7 @@ public class LoanServiceImpl implements LoanService {
 
 	@Override
 	public Optional<Loan> getById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		return repository.findById(id);
 	}
 
 	@Override
