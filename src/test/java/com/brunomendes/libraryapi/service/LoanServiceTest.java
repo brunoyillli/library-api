@@ -122,7 +122,7 @@ public class LoanServiceTest {
 		verify(repository).save(loan);
 	}
 	
-	public Loan createLoan() {
+	public static Loan createLoan() {
 		Book book = Book.builder().id(1l).build();
 		return Loan.builder()
 				.book(book)
