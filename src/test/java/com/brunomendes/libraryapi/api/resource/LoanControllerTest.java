@@ -62,7 +62,7 @@ public class LoanControllerTest {
 	public void createLoanTest() throws Exception {
 		Book book = Book.builder().id(1l).isbn("123").build();
 		Loan loan = Loan.builder().id(1l).customer("Fulano").book(book).loanDate(LocalDate.now()).build();
-		LoanDTO dto = LoanDTO.builder().isbn("123").customer("Fulano").build();
+		LoanDTO dto = LoanDTO.builder().isbn("123").email("customer@mail.com").customer("Fulano").build();
 		String json = new ObjectMapper().writeValueAsString(dto);
 
 		BDDMockito.given(bookService.getBookByIsbn("123")).willReturn(Optional.of(book));
