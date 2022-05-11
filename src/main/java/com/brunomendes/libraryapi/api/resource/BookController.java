@@ -28,17 +28,21 @@ import com.brunomendes.libraryapi.model.entity.Loan;
 import com.brunomendes.libraryapi.service.BookService;
 import com.brunomendes.libraryapi.service.LoanService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Tag(name = "book", description = "the Book API")
 public class BookController {
 	
 	private final BookService service;
 	private final ModelMapper modelMapper; 
 	private final LoanService loanService;
 
+	@Operation(summary = "Registrar um livro")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public BookDTO create( @RequestBody @Valid BookDTO dto) {
@@ -47,7 +51,7 @@ public class BookController {
 		return modelMapper.map(entity, BookDTO.class);
 	}
 	
-	
+	@Operation(summary = "Busca um livro pelo ID")
 	@GetMapping("{id}")
 	public BookDTO get(@PathVariable Long id) {
 		
@@ -57,6 +61,7 @@ public class BookController {
 		
 	}
 	
+	@Operation(summary = "Deleta um livro")
 	@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
@@ -64,6 +69,7 @@ public class BookController {
 		service.delete(book);
 	}
 	
+	@Operation(summary = "Altera um livro pelo ID")
 	@PutMapping("{id}")
 	public BookDTO update( @PathVariable Long id, BookDTO dto) {
         return service.getById(id).map( book -> {
@@ -76,6 +82,7 @@ public class BookController {
         }).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 	}
 	
+	@Operation(summary = "Filtrar livros")
 	@GetMapping
 	public Page<BookDTO> find( BookDTO dto, Pageable pageRequest ){
 		Book filter = modelMapper.map(dto, Book.class);
@@ -87,6 +94,7 @@ public class BookController {
 		return new PageImpl<BookDTO>( list, pageRequest, result.getTotalElements() );
 	}
 	
+	@Operation(summary = "Busca os emprestimos de um livro")
 	@GetMapping("{api}/loans")
 	public Page<LoanDTO> loansByBook(@PathVariable Long id, Pageable pageable){
 		Book book = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
