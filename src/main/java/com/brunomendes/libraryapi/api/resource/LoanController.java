@@ -28,11 +28,14 @@ import com.brunomendes.libraryapi.model.entity.Loan;
 import com.brunomendes.libraryapi.service.BookService;
 import com.brunomendes.libraryapi.service.LoanService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/loans")
 @RequiredArgsConstructor
+@Tag(name = "Loan", description = "the Loan API")
 public class LoanController {
 	
 	private final LoanService service;
@@ -41,6 +44,7 @@ public class LoanController {
 	
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Registrar um emprestimo")
     public Long create(@RequestBody LoanDTO dto) {
         Book book = bookService
                 .getBookByIsbn(dto.getIsbn())
@@ -58,6 +62,7 @@ public class LoanController {
     
     @PatchMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Busca um emprestimo pelo ID")
     public void returnBook( @PathVariable Long id, @RequestBody ReturnedLoanDTO dto) {
     	Loan loan = service.getById(id).orElseThrow( () -> 
     			new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -67,6 +72,7 @@ public class LoanController {
     }
     
     @GetMapping
+    @Operation(summary = "Filtrar emprestimos")
     public Page<LoanDTO> find(LoanFilterDTO dto, Pageable pageRequest){
     	Page<Loan> result = service.find(dto, pageRequest);
     	List<LoanDTO> loans = result
