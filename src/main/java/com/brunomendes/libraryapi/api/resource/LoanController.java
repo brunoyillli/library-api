@@ -31,11 +31,13 @@ import com.brunomendes.libraryapi.service.LoanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/loans")
 @RequiredArgsConstructor
 @Tag(name = "Loan", description = "the Loan API")
+@Slf4j
 public class LoanController {
 	
 	private final LoanService service;
@@ -46,6 +48,7 @@ public class LoanController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Registrar um emprestimo")
     public Long create(@RequestBody LoanDTO dto) {
+    	log.info("creating a loan for the following isbn: {} ", dto.getIsbn());
         Book book = bookService
                 .getBookByIsbn(dto.getIsbn())
                 .orElseThrow(() ->
@@ -64,6 +67,7 @@ public class LoanController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Busca um emprestimo pelo ID")
     public void returnBook( @PathVariable Long id, @RequestBody ReturnedLoanDTO dto) {
+    	log.info("obtaining details for loan id: {}", id);
     	Loan loan = service.getById(id).orElseThrow( () -> 
     			new ResponseStatusException(HttpStatus.NOT_FOUND));
     	loan.setReturned(dto.getReturned());

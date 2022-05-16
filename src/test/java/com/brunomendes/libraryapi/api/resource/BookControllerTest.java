@@ -33,6 +33,7 @@ import com.brunomendes.libraryapi.api.dto.BookDTO;
 import com.brunomendes.libraryapi.exception.BusinessException;
 import com.brunomendes.libraryapi.model.entity.Book;
 import com.brunomendes.libraryapi.service.BookService;
+import com.brunomendes.libraryapi.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(SpringExtension.class)
@@ -48,6 +49,9 @@ public class BookControllerTest {
 	
 	@MockBean
 	BookService service;
+	
+	@MockBean
+	LoanService loanService;
 	
 	@Test
 	@DisplayName("Deve criar um livro com sucesso")
