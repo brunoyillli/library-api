@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.hamcrest.Matchers;
@@ -32,6 +34,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.brunomendes.libraryapi.api.dto.BookDTO;
 import com.brunomendes.libraryapi.exception.BusinessException;
 import com.brunomendes.libraryapi.model.entity.Book;
+import com.brunomendes.libraryapi.model.entity.Loan;
 import com.brunomendes.libraryapi.service.BookService;
 import com.brunomendes.libraryapi.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -265,6 +268,60 @@ public class BookControllerTest {
         	;
 	}
 	
+	@Test
+	@DisplayName("Deve filtrar emprestimos de um livros")
+	public void findLoansByBookTest() throws Exception{
+		Long id = 1L;	
+		
+		Book book = Book.builder()
+				.id(id)
+				.title(createNewBook().getTitle())
+				.author(createNewBook().getAuthor())
+				.isbn(createNewBook().getIsbn())
+				.build();
+		Loan loan = Loan.builder().id(1l).customer("Fulano").book(book).loanDate(LocalDate.now()).build();
+		
+		 BDDMockito
+         .given(service.getById(Mockito.anyLong()))
+         .willReturn(Optional.of(book));
+        
+		 BDDMockito
+         .given(loanService.getLoansByBook(Mockito.any(Book.class), Mockito.any(Pageable.class)))
+         .willReturn(new PageImpl<>(Collections.singletonList(loan), PageRequest.of(0, 100), 1));
+		 
+		 MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+	                .get(BOOK_API.concat("/" + id + "/loans?size=100"))
+	                .accept(MediaType.APPLICATION_JSON);
+        
+		 mvc.perform(request)
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("content", hasSize(1)))
+         .andExpect(jsonPath("pageable.pageNumber").value(0))
+         .andExpect(jsonPath("pageable.pageSize").value(100))
+         .andExpect(jsonPath("totalElements").value(1));
+	}
+	
+	 @Test
+	    @DisplayName("Deve retornar 404 quando procurar emprestimos de um livro inexistente")
+	    public void findLoansByNonexistentBookTest() throws Exception {
+	        long id = 1L;
+
+	        Loan loan = Loan.builder().id(id).build();
+
+	        BDDMockito
+	                .given(service.getById(Mockito.anyLong()))
+	                .willReturn(Optional.empty());
+
+	        BDDMockito
+	                .given(loanService.getLoansByBook(Mockito.any(Book.class), Mockito.any(Pageable.class)))
+	                .willReturn(new PageImpl<>(Collections.singletonList(loan), PageRequest.of(0, 100), 0));
+
+	        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+	                .get(BOOK_API.concat("/" + id + "/loans?size=100"))
+	                .accept(MediaType.APPLICATION_JSON);
+
+	        mvc.perform(request).andExpect(status().isNotFound());
+	    }
 	
 	private BookDTO createNewBook() {
 		return BookDTO.builder().author("Arthur").title("As aventuras").isbn("001").build();

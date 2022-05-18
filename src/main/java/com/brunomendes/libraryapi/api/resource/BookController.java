@@ -100,7 +100,7 @@ public class BookController {
 	}
 	
 	@Operation(summary = "Busca os emprestimos de um livro")
-	@GetMapping("{api}/loans")
+	@GetMapping("{id}/loans")
 	public Page<LoanDTO> loansByBook(@PathVariable Long id, Pageable pageable){
 		Book book = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 		Page<Loan> result = loanService.getLoansByBook(book, pageable);
